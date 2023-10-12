@@ -86,7 +86,7 @@ class ReSendOtpView(generics.CreateAPIView):
            except CustomUser.DoesNotExist:
             return Response({'message':'Email doesn`t exists'},status=status.HTTP_400_BAD_REQUEST)
         
-           user.resend_otp()
+           user.reset_otp()
            user.generate_otp()
            print(f"Reseted otp of {user.firstname}  is {user.otp}")
            return Response({'message': 'Otp resent successfully'})

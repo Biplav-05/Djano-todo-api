@@ -62,7 +62,7 @@ class CustomUser(AbstractUser):
                 return True
         return False
     
-    def resend_otp(self):
+    def reset_otp(self):
         self.otp = None;
         self.otp_created_at = None
         self.save()
