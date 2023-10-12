@@ -8,14 +8,14 @@ from rest_framework_simplejwt.views import (
 )
 
 urlpatterns =[
-    path('',ListTodo.as_view()),
-    path('<int:pk>/',DetailTodo.as_view()),
-    path('create/',CreateTodo.as_view()),
-    path('delete/<int:pk>',DeleteTodo.as_view()),
+    path('',ListTodo.as_view(),name='todolist'),
+    path('<int:pk>/',DetailTodo.as_view(),name='updatetodo'),
+    path('create/',CreateTodo.as_view(),name='createtodo'),
+    path('delete/<int:pk>',DeleteTodo.as_view(),name='deletetodo'),
 
     #for jwt auth
-    path('token/',TokenObtainPairView.as_view(),name='tokenview'),
-    path('refresh_token',TokenRefreshView.as_view(),name='refreshtoken'),
+    #path('token/',TokenObtainPairView.as_view(),name='tokenview'),
+    #path('refresh_token',TokenRefreshView.as_view(),name='refreshtoken'),
 
     #for User 
     path('createuser/',CreateUser.as_view(),name='createuser'),

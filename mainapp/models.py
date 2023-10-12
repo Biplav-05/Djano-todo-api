@@ -45,7 +45,6 @@ class CustomUser(AbstractUser):
     groups = models.ManyToManyField(Group, blank=True, related_name='customuser_groups')
     user_permissions = models.ManyToManyField(Permission, blank=True, related_name='customuser_user_permissions')
 
-
     objects = CustomUserManager()
 
     def generate_otp(self):
