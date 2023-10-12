@@ -143,7 +143,10 @@ CORS_ALLOW_ALL_ORIGINS = True
 REST_FRAMEWORK = {
      'DEFAULT_AUTHENTICATION_CLASSES': [
          'mainapp.authentication.EmailJwtAuthentication',
-     ]
+     ],
+     #for pagination
+     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+     'PAGE_SIZE' : 5,
 }
 
 

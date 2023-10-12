@@ -14,7 +14,7 @@ from django.contrib.auth import authenticate
 
 class ListTodo(generics.ListAPIView):
     #permission_classes = (IsAuthenticatedOrReadOnly,)
-    queryset = TodoModel.objects.all();
+    queryset = TodoModel.objects.order_by('-date').all();
     serializer_class = TodoSerializer
 
 class DetailTodo(generics.RetrieveUpdateAPIView):
