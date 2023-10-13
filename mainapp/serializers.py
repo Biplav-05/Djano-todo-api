@@ -6,7 +6,13 @@ from django.core.exceptions import ValidationError
 class TodoSerializer(serializers.ModelSerializer):
     class Meta:
         model = TodoModel
-        fields =['id','title','description','date','isComplete']
+        fields =['id','title','description','deadline','isComplete']
+
+class TodoGroupedByDeadlineSerializer(serializers.Serializer):
+    deadline = serializers.DateField()
+    todo_count = serializers.IntegerField()
+    todos = TodoSerializer(many=True)
+
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(write_only=True)

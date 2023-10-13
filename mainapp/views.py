@@ -4,6 +4,7 @@ from .serializers import *
 from .models import *
 from rest_framework.permissions import *
 from rest_framework.response import Response
+from django.db.models import Count
 
 #for login
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -13,8 +14,37 @@ from django.contrib.auth import authenticate
 
 class ListTodo(generics.ListAPIView):
     #permission_classes = (IsAuthenticatedOrReadOnly,)
-    queryset = TodoModel.objects.order_by('-date').all();
+    queryset = TodoModel.objects.order_by('-deadline').all();
     serializer_class = TodoSerializer
+
+
+class TodoGroupedByDeadlineView(generics.ListAPIView):
+    
+    serializer_class = TodoGroupedByDeadlineSerializer
+
+    def get_queryset(self):
+        grouped_todos = TodoModel.objects.values('deadline').annotate(todo_count=Count('id')).order_by('deadline')
+        return grouped_todos
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+
+        response_data = []
+
+        for group in queryset:
+            todos_in_group = TodoModel.objects.filter(deadline=group['deadline'])
+            serialized_todos = TodoSerializer(todos_in_group, many=True).data
+
+            group_data = {
+                'deadline': group['deadline'],
+                'todo_count': group['todo_count'],
+                'todos': serialized_todos,
+            }
+
+            response_data.append(group_data)
+
+        return Response(response_data)
+
 
 class DetailTodo(generics.RetrieveUpdateAPIView):
     queryset = TodoModel.objects.all();

@@ -9,6 +9,7 @@ from rest_framework_simplejwt.views import (
 
 urlpatterns =[
     path('',ListTodo.as_view(),name='todolist'),
+    path('grouped_by_deadline/',TodoGroupedByDeadlineView.as_view(),name='grouped_by_deadline'),
     path('<int:pk>/',DetailTodo.as_view(),name='updatetodo'),
     path('create/',CreateTodo.as_view(),name='createtodo'),
     path('delete/<int:pk>',DeleteTodo.as_view(),name='deletetodo'),

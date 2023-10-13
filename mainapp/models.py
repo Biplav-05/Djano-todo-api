@@ -8,7 +8,7 @@ from django.contrib.auth.models import AbstractUser,BaseUserManager,Group,Permis
 class TodoModel(models.Model):
     title = models.CharField(max_length=50,blank=False)
     description = models.TextField(blank=False)
-    date = models.DateTimeField(default=datetime.now)
+    deadline = models.DateField()
     isComplete = models.BooleanField(default=False)
 
     def __str__(self):
