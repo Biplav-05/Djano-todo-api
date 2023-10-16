@@ -38,7 +38,7 @@ class CustomUser(AbstractUser):
     firstname = models.CharField(max_length=50)
     lastname = models.CharField(max_length=50)
     otp = models.CharField(max_length=16,blank=True,null=True)
-    otp_created_at = models.DateTimeField(blank=True,null=True)
+    otp_created_at = models.DateTimeField(blank=True,null=True,auto_now_add=True)
     is_verified = models.BooleanField(default=False)
     username = models.CharField(max_length=150, unique=False, blank=True, null=True)
 

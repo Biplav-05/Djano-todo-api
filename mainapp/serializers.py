@@ -3,6 +3,11 @@ from .models import *
 from django.core.validators  import validate_email
 from django.core.exceptions import ValidationError
 
+# class TodoSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = TodoModel
+#         fields =['id','title','description','deadline']
+
 class TodoSerializer(serializers.ModelSerializer):
     class Meta:
         model = TodoModel

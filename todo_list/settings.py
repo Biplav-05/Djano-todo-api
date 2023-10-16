@@ -28,6 +28,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+USE_TZ = True
+
+
 
 # Application definition
 
@@ -145,8 +148,9 @@ REST_FRAMEWORK = {
          'mainapp.authentication.EmailJwtAuthentication',
      ],
      #for pagination
-     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-     'PAGE_SIZE' : 5,
+    #  'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    #  'PAGE_SIZE' : 5,
+    
 }
 
 
