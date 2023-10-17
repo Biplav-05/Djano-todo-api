@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'accounts',
 
     #apps
     'mainapp',
@@ -145,7 +146,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 #configuring the setting to use jwt token
 REST_FRAMEWORK = {
      'DEFAULT_AUTHENTICATION_CLASSES': [
-         'mainapp.authentication.EmailJwtAuthentication',
+         'accounts.authentication.EmailJwtAuthentication',
      ],
      #for pagination
     #  'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
@@ -156,9 +157,9 @@ REST_FRAMEWORK = {
 
 
 AUTHENTICATION_BACKENDS = [
-    'mainapp.authentication.EmailBackend',
+    'accounts.authentication.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',  
 ]
 
 
-AUTH_USER_MODEL = 'mainapp.CustomUser'
+AUTH_USER_MODEL = 'accounts.CustomUser'
