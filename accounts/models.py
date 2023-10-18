@@ -24,8 +24,6 @@ class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     firstname = models.CharField(max_length=50)
     lastname = models.CharField(max_length=50)
-    otp = models.CharField(max_length=16,blank=True,null=True)
-    otp_created_at = models.DateTimeField(blank=True,null=True,auto_now_add=True)
     is_verified = models.BooleanField(default=False)
     username = models.CharField(max_length=150, unique=False, blank=True, null=True)
 
@@ -33,6 +31,12 @@ class CustomUser(AbstractUser):
     user_permissions = models.ManyToManyField(Permission, blank=True, related_name='customuser_user_permissions')
 
     objects = CustomUserManager()
+    
+class OTP(models.Model):
+    user = models.OneToOneField(CustomUser,on_delete= models.CASCADE,blank=True,null=True,related_name='OTP')
+    otp = models.CharField(max_length=16,blank=True,null=True)
+    otp_created_at = models.DateTimeField(blank=True,null=True,auto_now_add=True)
+    
     
     def generate_otp(self):
         otp = OtpGenerator.generate_otp()
@@ -53,6 +57,10 @@ class CustomUser(AbstractUser):
         self.otp_created_at = None
         self.save()
         
+    def __str__(self):
+        return f"otp for user {self.user} is {self.otp}";
+    
+    
 class OtpGenerator:
     def generate_otp():
         return str(random.randint(100000, 999999))

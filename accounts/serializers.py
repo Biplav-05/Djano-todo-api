@@ -26,8 +26,9 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     def create(self,validate_data):
         validate_data.pop('confirm_password',None)
         user = CustomUser.objects.create_user(**validate_data)
-        user.generate_otp()
-        print(f"otp for user {user.firstname} : {user.otp}")
+        user_otp = OTP.objects.create(user=user)
+        user_otp.generate_otp()
+        print(f"otp for user {user.firstname} : {user_otp.otp}")
         return user;
 
 class OtpVerificationSerializer(serializers.Serializer):
@@ -36,6 +37,7 @@ class OtpVerificationSerializer(serializers.Serializer):
 
 class ReSendOtpSerializer(serializers.Serializer):
     email = serializers.EmailField()
+    
         
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()

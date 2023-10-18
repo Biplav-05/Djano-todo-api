@@ -1,56 +1,50 @@
 from rest_framework.views import APIView
-from django.shortcuts import render
-from rest_framework import generics,status
+from rest_framework import status
 from .serializers import *
 from .models import *
 from rest_framework.permissions import *
 from rest_framework.response import Response
-from django.db.models import Count
 from django.http import Http404
-from rest_framework.pagination import PageNumberPagination
+from rest_framework import generics
+from .services import *
 
+
+class TodoListView(generics.ListAPIView):
+    serializer_class = TodoSerializer
+    
+    def get_queryset(self):
+        queryset = TodoListServices.list_todo(self.request)
+        return queryset
+    
+    def list(self,request):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset,many=True)
+        return Response(serializer.data)
+
+class TodoGroupedView(generics.ListAPIView):
+    serializer_class = TodoGroupedByDeadlineSerializer
+    
+    def get_queryset(self):
+        queryset= TodoListServices.grouped_by_deadline();
+        return queryset
+    
+    def list(self,request):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset,many=True)
+        return Response(serializer.data)
+    
+    
 class TodoApiView(APIView):
     
     def get(self, request, pk=None):  
         if pk is not None:
             return self.get_detail(request, pk)
-        elif 'group-by' in request.path:
-            return self.grouped_by_deadline(request)
         else:
             return self.list_todos(request)
     
     def list_todos(self, request):
-        queryset = TodoModel.objects.order_by('-deadline').all()
-        paginator = PageNumberPagination()
-        paginator.page_size = 5
-        page = paginator.paginate_queryset(queryset,request)
-            
-        serializer = TodoSerializer(page,many=True) if page else TodoSerializer(queryset,many=True)
-        result = {
-                'count': paginator.page.paginator.count,
-                'next': paginator.get_next_link(),
-                'previous': paginator.get_previous_link(),
-                'result':serializer.data,
-            } 
-        return Response(result)
-    
-    def grouped_by_deadline(self,request):
-        grouped_todos = TodoModel.objects.values('deadline').annotate(todo_count=Count('id')).order_by('deadline')
-        response_data = []
-        for group in grouped_todos:
-            todos_in_group = TodoModel.objects.filter(deadline=group['deadline'])
-            serialized_todos = TodoSerializer(todos_in_group, many=True).data
-
-            group_data = {
-                'deadline': group['deadline'],
-                'todo_count': group['todo_count'],
-                'todos': serialized_todos,
-            }
-
-            response_data.append(group_data)
-
-        return Response(response_data)
-        
+        result = TodoListServices.list_todo(request)
+        return Response(result)        
     
     def post(self, request):
         serializer = TodoSerializer(data=request.data)

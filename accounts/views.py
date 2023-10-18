@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate
 from .models import *
 from rest_framework import generics,status
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
 
 class CreateUser(generics.ListCreateAPIView):
     queryset = CustomUser.objects.all()
@@ -27,23 +28,30 @@ class OtpVerificationView(generics.CreateAPIView):
 
         email = serializer.validated_data['email']
         otp = serializer.validated_data['otp']
-
+        
+        
         try:
-            user = CustomUser.objects.get(email = email , otp = otp)
+            user = get_object_or_404(CustomUser, email=email)
+            otp_ = user.OTP 
+
+            if otp == otp_.otp:
+                
+                if not otp_.is_otp_verified():
+                    return Response({'message': 'OTP expired'}, status=status.HTTP_400_BAD_REQUEST)
+
+                if user.is_verified:
+                    return Response({'message': 'Provided OTP was already used'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                user.is_verified = True
+                user.save()
+
+                return Response({'message': 'OTP verified', 'is_verified': True})
+            else:
+                return Response({'message': 'Invalid otp'}, status=status.HTTP_400_BAD_REQUEST)
 
         except CustomUser.DoesNotExist:
-            return Response({'message': 'Invalid email or otp'},status=status.HTTP_400_BAD_REQUEST)
-        
-        if user.is_verified:
-            return Response({'message': 'Provided otp wad already used '},status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'Invalid email'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if user.is_otp_verified():
-            user.is_verified = True
-            user.save()
-            return Response({'message':'OTP verified','is_verified':True})
-        
-        else:
-            return Response({'message':'OTP expired'},status=status.HTTP_400_BAD_REQUEST)
 
 class ReSendOtpView(generics.CreateAPIView):
 
@@ -51,20 +59,18 @@ class ReSendOtpView(generics.CreateAPIView):
 
     def post(self,request):
         serializer = ReSendOtpSerializer(data=request.POST)
-        if(serializer.is_valid()):
-           email = serializer.validated_data['email']
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data['email']
 
-           try:
-            user = CustomUser.objects.get(email = email)
-           except CustomUser.DoesNotExist:
+        try:
+            user = get_object_or_404(CustomUser, email=email)
+            OTP.reset_otp(user)
+            OTP.generate_otp(user)
+            print(f"Reseted otp of {user.firstname}  is {user.otp}")
+            return Response({'message': 'Otp resent successfully'})
+            
+        except CustomUser.DoesNotExist:
             return Response({'message':'Email doesn`t exists'},status=status.HTTP_400_BAD_REQUEST)
-        
-           user.reset_otp()
-           user.generate_otp()
-           print(f"Reseted otp of {user.firstname}  is {user.otp}")
-           return Response({'message': 'Otp resent successfully'})
-        else:
-           return Response({'message':'invalid data entered'},status=400)
 
 class LoginView(generics.CreateAPIView):
     serializer_class = LoginSerializer
@@ -86,6 +92,7 @@ class LoginView(generics.CreateAPIView):
                         'refresh': str(refresh),
                         'access': str(refresh.access_token),
                         'user_id': user.pk,
+                        'Name' : user.firstname,
                         'email': user.email,
                         'message': 'Logged in'
                     })
