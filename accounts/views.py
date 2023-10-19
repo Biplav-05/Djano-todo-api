@@ -9,27 +9,16 @@ from django.shortcuts import get_object_or_404
 class CreateUser(generics.ListCreateAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserRegistrationSerializer
-    
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response({'message': 'User registered successfully'}, status=status.HTTP_201_CREATED, headers=headers)
 
 class OtpVerificationView(generics.CreateAPIView):
     model = CustomUser
     serializer_class = OtpVerificationSerializer
     
-
     def post(self,request,*args,**kwargs):
         serializer = OtpVerificationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         email = serializer.validated_data['email']
-        otp = serializer.validated_data['otp']
-        
-        
+        otp = serializer.validated_data['otp']      
         try:
             user = get_object_or_404(CustomUser, email=email)
             otp_ = user.OTP 
