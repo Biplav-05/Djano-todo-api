@@ -7,6 +7,7 @@ from .services import *
 from rest_framework import status
 
 class TodoListView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self,request):
         if 'group' in request.query_params:
             result = TodoListServices.grouped_by_deadline(request)
@@ -21,6 +22,7 @@ class TodoListView(APIView):
     
     
 class TodoDetailView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self,pk):
         result = TodoListServices.get_todo_detail(pk)
         return Response(result,status = status.HTTP_200_OK)

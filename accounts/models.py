@@ -26,7 +26,6 @@ class CustomUser(AbstractUser):
     lastname = models.CharField(max_length=50)
     is_verified = models.BooleanField(default=False)
     username = models.CharField(max_length=150, unique=False, blank=True, null=True)
-
     groups = models.ManyToManyField(Group, blank=True, related_name='customuser_groups')
     user_permissions = models.ManyToManyField(Permission, blank=True, related_name='customuser_user_permissions')
 
@@ -39,10 +38,12 @@ class OTP(models.Model):
     
     
     def generate_otp(self):
+        print("Before generate: ", self.otp)
         otp = OtpGenerator.generate_otp()
         self.otp = otp
         self.otp_created_at = timezone.now()
         self.save()
+        print("After generate: ", self.otp)
         return otp
 
     def is_otp_verified(self):
@@ -56,11 +57,10 @@ class OTP(models.Model):
         self.otp = None;
         self.otp_created_at = None
         self.save()
-        
+  
     def __str__(self):
         return f"otp for user {self.user} is {self.otp}";
-    
-    
+
 class OtpGenerator:
     def generate_otp():
         return str(random.randint(100000, 999999))
