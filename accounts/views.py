@@ -66,7 +66,7 @@ class LoginView(generics.CreateAPIView):
     
     def post(self,request):
         serializer = LoginSerializer(data=request.POST)
-        if(serializer.is_valid()):
+        if(serializer.is_valid(raise_exception=True)):
             email = serializer.validated_data['email']
             password = serializer.validated_data['password']
 
@@ -75,7 +75,6 @@ class LoginView(generics.CreateAPIView):
             if user is not None:
                 usr = CustomUser.objects.get(email = email)
                 if(usr.is_verified == True):
-                 #return Response({'message' : 'Logged in '})
                     refresh = RefreshToken.for_user(user)
                     return Response({
                         'refresh': str(refresh),

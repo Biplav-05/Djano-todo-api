@@ -4,23 +4,20 @@ from .models import *
 from django.core.validators  import validate_email
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
+    
     confirm_password = serializers.CharField(write_only=True)
-
     class Meta:
         model = CustomUser
         fields = ['firstname','lastname','email','password','confirm_password']
         extra_kwargs = {'password':{'write_only':True}}
 
-
     def validate(self,data):
         if data['password'] != data['confirm_password']:
             raise serializers.ValidationError("New and confirm password didn't match")
-        
         try:
          validate_email(data['email'])
         except ValidationError:
             raise serializers.ValidationError("Invalid email format")
-
         return data
 
     def create(self,validate_data):

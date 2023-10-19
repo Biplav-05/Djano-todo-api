@@ -6,8 +6,8 @@ class TodoSerializer(serializers.ModelSerializer):
         model = TodoModel
         fields =['id','title','description','deadline','isComplete']
 
-class TodoGroupedByDeadlineSerializer(serializers.Serializer):
-    deadline = serializers.DateField()
-    todo_count = serializers.IntegerField()
-    todos = TodoSerializer(many=True)
+# class TodoGroupedByDeadlineSerializer(serializers.Serializer):
+#     deadline = serializers.DateField()
+#     todo_count = serializers.IntegerField()
+#     todos = TodoSerializer(many=True)
 

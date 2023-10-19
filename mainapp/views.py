@@ -8,12 +8,11 @@ from rest_framework import status
 
 class TodoListView(APIView):
     def get(self,request):
-        if 'deadline' in request.query_params:
-            result = TodoListServices.list_todo(request)
-        elif 'group' in request.query_params:
+        if 'group' in request.query_params:
             result = TodoListServices.grouped_by_deadline(request)
+            
         else:
-            result = {'message':'invalid query parameter'}
+            result = TodoListServices.list_todo(request)
         return Response(result)
     
     def post(self,request):
