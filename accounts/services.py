@@ -12,7 +12,7 @@ class LoginService:
             email = serializer.validated_data['email']
             password = serializer.validated_data['password']
 
-            user = authenticate( email = email , password = password)
+            user = authenticate(email=email , password=password)
 
             if user is not None:
                 usr = CustomUser.objects.get(email = email)
@@ -78,8 +78,8 @@ class OtpService:
             user = get_object_or_404(CustomUser, email=email)
             otp_ = OTP.objects.get(user = user)
             otp_.reset_otp()
-            temp = otp_.generate_otp()
-            print(f"Reseted otp of {user.firstname}  is {temp}")
+            otp_.generate_otp()
+            print(f"Reseted otp of {user.firstname}  is {user.otp}")
             return {'message': 'Otp resent successfully'}
             
         except CustomUser.DoesNotExist:
