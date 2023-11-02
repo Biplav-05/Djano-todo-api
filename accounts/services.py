@@ -1,4 +1,3 @@
-from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from accounts.models import OTP, CustomUser
 from accounts.serializers import LoginSerializer, OtpVerificationSerializer, ReSendOtpSerializer
@@ -79,7 +78,7 @@ class OtpService:
             otp_ = OTP.objects.get(user = user)
             otp_.reset_otp()
             otp_.generate_otp()
-            print(f"Reseted otp of {user.firstname}  is {user.otp}")
+            print(f"Reseted otp of {user.firstname}  is {otp_.otp}")
             return {'message': 'Otp resent successfully'}
             
         except CustomUser.DoesNotExist:

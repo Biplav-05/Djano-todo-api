@@ -1,8 +1,8 @@
 import factory
 from accounts.models import CustomUser,OTP
-from django.contrib.auth.hashers import make_password 
 
-class CustomUserFactory(factory.Factory):
+
+class CustomUserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = CustomUser
         
@@ -12,7 +12,6 @@ class CustomUserFactory(factory.Factory):
     is_verified = False
     
     username = factory.Faker('user_name')
-    password = factory.LazyAttribute(lambda _: make_password('test12345'))
     
     @classmethod
     def create(cls, **kwargs):
@@ -22,7 +21,7 @@ class CustomUserFactory(factory.Factory):
         return user
     
     
-class OTPFactory(factory.Factory):
+class OTPFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = OTP
     
