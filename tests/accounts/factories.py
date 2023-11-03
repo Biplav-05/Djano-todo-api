@@ -1,7 +1,6 @@
 import factory
 from accounts.models import CustomUser,OTP
 
-
 class CustomUserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = CustomUser
@@ -24,6 +23,6 @@ class CustomUserFactory(factory.django.DjangoModelFactory):
 class OTPFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = OTP
-    
+        
     user = factory.SubFactory(CustomUserFactory)
     otp = factory.Faker('random_int', min=100000, max=999999)
