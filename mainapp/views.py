@@ -23,7 +23,7 @@ class TodoListView(APIView):
     
 class TodoDetailView(APIView):
     permission_classes = [IsAuthenticated]
-    def get(self,pk):
+    def get(self,request,pk):
         result = TodoListServices.get_todo_detail(pk)
         return Response(result,status = status.HTTP_200_OK)
        
@@ -31,6 +31,6 @@ class TodoDetailView(APIView):
         result = TodoListServices.update_todo(pk,request.data)
         return Response(result,status=status.HTTP_200_OK)
     
-    def delete(self,pk):
+    def delete(self,request,pk):
         result = TodoListServices.delete_todo(pk)
         return Response(result,status=status.HTTP_202_ACCEPTED)
