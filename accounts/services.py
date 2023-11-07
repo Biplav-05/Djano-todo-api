@@ -38,7 +38,7 @@ class LoginService:
 
 
 class OtpService:
-    def verfy_otp(data):
+    def verify_otp(data):
         serializer = OtpVerificationSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data['email']

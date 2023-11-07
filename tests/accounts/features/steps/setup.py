@@ -1,7 +1,5 @@
-
 import os
 from django import setup
-
 os.environ['DJANGO_SETTINGS_MODULE'] = 'todo_list.settings'
 setup()
 
@@ -24,3 +22,5 @@ def step_when_user_sends_post_request(context):
 @then('the response status code should be 201')
 def step_then_response_status_code_should_be(context):
     assert context.response.status_code == 201
+
+

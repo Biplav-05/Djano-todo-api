@@ -1,73 +1,81 @@
 import pytest
-from django.urls import reverse
-from rest_framework.test import APIClient
-from .factories import CustomUserFactory, OTPFactory
 from rest_framework import status
-from django.contrib.auth.hashers import make_password
+from unittest.mock import patch
+from accounts.services import LoginService,OtpService
+from .mock_services import MockedLoginService,MockOtpService
+from django.test import RequestFactory
+from django.urls import reverse
+from accounts.views import LoginView,OtpVerificationView
+
 
 @pytest.fixture
-def client():
-    return APIClient()
+def factory():
+    return RequestFactory()
 
-@pytest.fixture
-def test_otp_user():
-    user = CustomUserFactory(email='test@email.com', password='test12345')
-    otp = OTPFactory(user=user)
-    return user, otp
+#Login view test
+@pytest.mark.django_db
+def test_login_view_with_valid_credentials(factory):
+    request_data = {'email':'valid@gmail.com', 'password':'password'}
+    request = factory.post(reverse('login'),data=request_data)
+    with patch.object(LoginService, 'login', return_value=MockedLoginService.login(request_data)):
+        response = LoginView.as_view()(request)
+        assert response.status_code == status.HTTP_200_OK
+        assert 'message' in response.data
+        assert response.data['message'] == 'Logged in'
 
 @pytest.mark.django_db
-def test_create_user_view(client):
-    url = reverse('create-user')
-    user_data = {
-        'email': 'test@example.com',
-        'firstname': 'Test',
-        'lastname': 'Data',
-        'password': 'testpassword',
-        'confirm_password': 'testpassword',
-    }
-    response = client.post(url, data=user_data, format='json')
-    assert response.status_code == 201
-    
-@pytest.mark.django_db()
-def test_login_view(client):
-    user = CustomUserFactory.create(email='test@email.com', password=make_password('test12345'),is_verified=True)
-    url = reverse('login')
-    user_data = {
-        'email': user.email,
-        'password': 'test12345',
-    }
-    response = client.post(url, data=user_data, format='json')
+def test_login_view_with_unverified_credentials(factory):
+    request_data = {'email':'unverified@gmail.com', 'password':'password'}
+    request = factory.post(reverse('login'),data=request_data)
+    with patch.object(LoginService, 'login', return_value=MockedLoginService.login(request_data)):
+        response = LoginView.as_view()(request)
+        assert response.status_code == status.HTTP_200_OK
+        assert 'message' in response.data
+        assert response.data['message'] == 'User was not verified'
 
-    assert response.status_code == status.HTTP_200_OK
-    assert 'refresh' in response.data
-    assert 'user_id' in response.data
-    assert 'Name' in response.data
-    assert 'email' in response.data
-    assert 'message' in response.data
-    assert response.data['message'] == 'Logged in'
-    
+@pytest.mark.djnago_db
+def test_login_view_with_invalid_credentails(factory):
+    request_data = {'email':'invalid@mail.com','password':'invalidpassword'}
+    request = factory.post(reverse('login'),data=request_data)
+    with patch.object(LoginService,'login',return_value=MockedLoginService.login(request_data)):
+        response = LoginView.as_view()(request)
+        assert response.status_code == status.HTTP_200_OK
+        assert 'message' in response.data
+        assert response.data['message'] == 'Invalid username or password'
+
+#otp verification view
+@pytest.mark.dajngo_db
+def test_otpverification_view_with_valid_data(factory):
+    request_data = {'email':'verify@gmail.com','otp':'123456'}
+    request = factory.post(reverse('verify-otp'),data=request_data)
+    with patch.object(OtpService,'verify_otp',return_value=MockOtpService.verify_otp(request_data)):
+        response = OtpVerificationView.as_view()(request)
+        assert response.status_code == status.HTTP_200_OK
+        assert 'message' in response.data
+        assert response.data['message'] == 'OTP verified'
+
 @pytest.mark.django_db
-def test_otp_verification_view(client, test_otp_user):
-    url = reverse('verify-otp')
-    user,otp = test_otp_user
-    otp_data = {
-        'email': user.email,
-        'otp': otp.otp,
-    }
-    response = client.post(url, data=otp_data, format='json')
-    assert response.status_code == 200
-    assert 'message' in response.data
-    assert response.data['message'] == 'OTP verified'
-    
+def test_otpverification_view_with_already_used_otp(factory):
+    request_data = {'email':'already@example.com','otp':'456789'}
+    request = factory.post(reverse('verify-otp'),data=request_data)
+    with patch.object(OtpService,'verify_otp',return_value=MockOtpService.verify_otp(request_data)):
+        response = OtpVerificationView.as_view()(request)
+        assert response.status_code == status.HTTP_200_OK
+        assert 'message' in response.data
+        assert response.data['message'] == 'Provided OTP was already used'
+
 @pytest.mark.django_db
-def test_otp_resendotp_view(client,test_otp_user):
-    url = reverse('resend-otp')
-    user, _ = test_otp_user
-    data = {
-        'email' : user.email
-    }
-    response = client.put(url,data=data,format='json')
-    assert response.status_code == 200
-    assert 'message' in response.data
-    assert response.data['message'] == 'Otp resent successfully'
-    
+def test_otpverification_view_with_expired_otp(factory):
+    request_data = {'email':'expired@example.com','otp':'112233'}
+    request = factory.post(reverse('verify-otp'),data=request_data)
+    with patch.object(OtpService,'verify_otp',return_value=MockOtpService.verify_otp(request_data)):
+        response = OtpVerificationView.as_view()(request)
+        assert response.status_code == status.HTTP_200_OK
+        assert 'message' in response.data 
+        assert response.data['message'] == 'OTP expired'
+
+
+# @pytest.mark.django_db
+# def test_otpverification_view_with_invalid_user_email(factory):
+
+

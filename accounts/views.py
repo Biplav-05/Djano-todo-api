@@ -20,7 +20,7 @@ class OtpVerificationView(generics.CreateAPIView):
     serializer_class = OtpVerificationSerializer
     
     def post(self,request):
-        result = OtpService.verfy_otp(request.data)
+        result = OtpService.verify_otp(request.data)
         return Response(result)
 
 class ResendOtpView(APIView):
